@@ -12,7 +12,10 @@ rm -Rf files/usr/share/amule/webserver/AmuleWebUI-Reloaded && git clone https://
 rm -Rf files/usr/share/aria2 && git clone https://github.com/P3TERX/aria2.conf files/usr/share/aria2
 rm -Rf package/*/*/antileech/src/* && git clone https://github.com/persmule/amule-dlp.antiLeech package/custom/lean/antileech/src
 rm -Rf tools/upx && svn co https://github.com/coolsnowwolf/lede/trunk/tools/upx tools/upx
+svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/default-settings/i18n package/custom/lean/default-settings/po/zh_Hans
+
 mkdir package/custom/first && cd package/custom/first
+svn co https://github.com/fw876/helloworld/trunk/luci-app-ssr-plus
 git clone https://github.com/rufengsuixing/luci-app-adguardhome
 git clone https://github.com/jerrykuku/luci-theme-argon -b 19.07_stable
 git clone https://github.com/pymumu/luci-app-smartdns -b lede
@@ -27,11 +30,12 @@ git clone https://github.com/lisaac/luci-app-dockerman
 svn co https://github.com/coolsnowwolf/packages/trunk/sound/forked-daapd
 svn co https://github.com/openwrt/luci/trunk/applications/luci-app-sqm
 
-svn co https://github.com/Lienol/openwrt-package/trunk/lienol/luci-app-passwall
+svn co https://github.com/kenzok8/openwrt-packages/trunk/luci-app-passwall
 svn co https://github.com/Lienol/openwrt-package/trunk/package/tcping
-svn co https://github.com/Lienol/openwrt-package/trunk/package/chinadns-ng
-svn co https://github.com/Lienol/openwrt-package/trunk/package/brook
+git clone https://github.com/pexcn/openwrt-chinadns-ng.git chinadns-ng
 svn co https://github.com/vernesong/OpenClash/trunk/luci-app-openclash
+svn co https://github.com/solidus1983/luci-theme-opentomato/branches/dev-v19.07/luci/themes/luci-theme-opentomato
+
 git clone https://github.com/garypang13/openwrt-adguardhome
 git clone https://github.com/garypang13/luci-app-php-kodexplorer
 git clone https://github.com/garypang13/luci-app-eqos
@@ -39,10 +43,11 @@ cd -
 
 cp -Rf ../diy/* ./
 # wget https://raw.githubusercontent.com/openwrt/luci/openwrt-19.07/luci.mk -O feeds/luci/luci.mk
-sed -i 's/ @!/ +@!/g' package/*/*/wrtbwmon/Makefile
+sed -i 's/ @!BUSYBOX_DEFAULT_IP:/ +/g' package/*/*/wrtbwmon/Makefile
 sed -i 's/root\/.aria2/usr\/share\/aria2/g' files/usr/share/aria2/aria2.conf
 sed -i 's/root\/Download/data\/download\/aria2/g' files/usr/share/aria2/*
 sed -i '/resolvfile=/d' package/*/*/luci-app-adguardhome/root/etc/init.d/AdGuardHome
+sed -i 's/LUCI_DEPENDS:=/LUCI_DEPENDS:=+transmission-daemon-openssl +transmission-web-control /g' package/*/*/luci-app-transmission/Makefile
 sed -i 's/+uhttpd //g' package/*/*/luci/Makefile
 sed -i '/_redirect2ssl/d' package/*/*/nginx/Makefile
 sed -i '/init_lan/d' package/*/*/nginx/files/nginx.init
@@ -94,15 +99,17 @@ find package/custom/*/ -maxdepth 2 ! -path "*shadowsocksr-libev*" -name "Makefil
 find package/custom/*/ -maxdepth 2 -name "Makefile" | xargs -i sed -i "s/SUBDIRS=/M=/g" {}
 sed -i 's/$(VERSION) &&/$(VERSION) ;/g' include/download.mk
 sed -i 's/PKG_BUILD_DIR:=/PKG_BUILD_DIR?=/g' feeds/luci/luci.mk
-find package/*/*/ -maxdepth 2 -path "*luci-app*" -name "Makefile" | xargs -i sed -i 's/$(INCLUDE_DIR)\/package.mk/$(TOPDIR)\/feeds\/luci\/luci.mk/g' {}
-find package/*/*/ -maxdepth 3 -d -name "zh-cn" | xargs -i rename -v 's/zh-cn/zh_Hans/' {}
-find package/*/*/ -maxdepth 2 -name "Makefile" | xargs -i sed -i "/bin\/upx/d" {}
-find package/*/*/ -maxdepth 2 -name "Makefile" | xargs -i sed -i "/po2lmo /d" {}
-find package/*/*/ -maxdepth 2 -name "Makefile" | xargs -i sed -i "/luci\/i18n/d" {}
-sed -i "/\.po/d" package/*/*/luci-app-diskman/Makefile
-sed -i "/\.po/d" package/*/*/luci-app-dockerman/Makefile
-find package/*/*/ -maxdepth 3 -name "Makefile" | xargs -i sed -i "s/+luci\( \|\$\)//g" {}
-find package/*/*/ -maxdepth 3 -name "Makefile" | xargs -i sed -i "s/+nginx\( \|\$\)/+nginx-ssl\1/g" {}
+sed -i 's/$(INCLUDE_DIR)\/package.mk/$(TOPDIR)\/feeds\/luci\/luci.mk/g' package/*/*/luci-app-*/Makefile
+sed -i "/foreach pkg/d" feeds/luci/luci.mk;
+sed -i "/foreach pkg/d" package/*/*/luci-*/Makefile
+sed -i '$a $(foreach pkg,$(LUCI_BUILD_PACKAGES),$(eval $(call BuildPackage,$(pkg))))' package/*/*/luci-*/Makefile
+find package/custom/*/*/ -maxdepth 2 -d -name "zh-cn" | xargs -i rename -v 's/zh-cn/zh_Hans/' {}
+sed -i "/bin\/upx/d" package/*/*/*/Makefile
+sed -i "/po2lmo /d" package/custom/*/*/Makefile
+sed -i "/luci\/i18n/d" package/custom/*/*/Makefile
+sed -i "/*\.po/d" package/custom/*/*/Makefile
+sed -i "s/+luci\( \|\$\)//g"  package/*/*/*/Makefile
+sed -i "s/+nginx\( \|\$\)/+nginx-ssl\1/g"  package/*/*/*/Makefile
 sed -i "s/askfirst/respawn/g" target/linux/x86/base-files/etc/inittab
 
 date=`date +%m.%d.%Y`

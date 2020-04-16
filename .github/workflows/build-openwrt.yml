@@ -90,7 +90,7 @@ jobs:
       run: |
         sed -i '$i uci set network.wan.username=${{ env.PPPOE_USERNAME }}' openwrt/package/*/*/default-settings/files/zzz-default-settings
         sed -i '$i uci set network.wan.password=${{ env.PPPOE_PASSWD }}' openwrt/package/*/*/default-settings/files/zzz-default-settings
-        sed -i '$i uci commit network' openwrt/package/lean/default-settings/files/zzz-default-settings
+        sed -i '$i uci commit network' openwrt/package/*/*/default-settings/files/zzz-default-settings
               
     - name: SSH connection to Actions
       uses: P3TERX/debugger-action@master
@@ -122,7 +122,26 @@ jobs:
     - name: Organize files
       id: organize
       run: |
-        mkdir firmware && find openwrt/bin/targets/*/*/* -maxdepth 0 -name "*uefi-gpt*" -or -name "*combined*" -or -name "*.vmdk" -or -name "sha256sums" | xargs -i mv -f {} ./firmware/
+        mkdir firmware && find openwrt/bin/*/*/*/ -maxdepth 1 \
+        -name "*combined*" \
+        -or -name "sha256sums" \
+        | xargs -i mv -f {} ./firmware/
+        find openwrt/bin/*/*/*/ -maxdepth 1 \
+        -or -name "*adbyby*" \
+        -or -name "*baidupcs*" \
+        -or -name "*cifs-mount*" \
+        -or -name "*music-remote-center*" \
+        -or -name "*airplay2*" \
+        -or -name "*openclash*" \
+        -or -name "*softethervpn*" \
+        -or -name "*syncdial*" \
+        -or -name "*usb-printer*" \
+        -or -name "*verysync*" \
+        -or -name "*vsftpd*" \
+        -or -name "*xlnetacc*" \
+        -or -name "*zerotier*" \
+        | xargs -i zip -r 插件补充包.zip {}
+        mv -f 插件补充包.zip ./firmware/
         cp openwrt/.config  ./firmware/config.txt
         cd firmware
         echo "::set-env name=FIRMWARE::$PWD"
