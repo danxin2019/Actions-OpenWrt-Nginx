@@ -15,7 +15,9 @@
 
 + 无需专业知识,无需linux服务器,人人皆可通过云编译定制编译自己的专属固件.
 
-+ 持续更新, 每周日零点定时自动云编译更新固件, 保证始终基于官方最新源码, 不用再担心因停更而需要更换固件.
++ 持续更新, 每周日零点定时自动云编译更新固件, 始终基于官方最新源码, 不用再担心因停更而需要更换固件.
+
++ 自选插件,对于未编译进固件且官方仓库中没有的插件将以ipk文件形式提供下载.方便自行安装.
 
 + SSL兼容,可同时使用http IP访问和绑定域名开启https访问
 
@@ -62,14 +64,14 @@ diy云编译教程: [Read the details in my blog (in Chinese) | 中文教程](ht
 + qBittorrent BT下载工具
 + 可道云 做NAS必备
 + PHP 建站与可道云必备
-+ 微力同步
-+ baidupcs-web 百度网盘下载管理工具
 + aMule 电骡下载 ed2k必备
 + Turbo ACC 网络加速
 + SQM QOS 智能网络优化
 + eqos IP限速
 + AppFilter App过滤
 + nlbwmon 宽带监控
+
+其他插件请在[Releases](https://github.com/garypang13/Actions-OpenWrt-Nginx/releases/latest)中下载对应的ipk文件,自行安装.
 
 ### 如何在本地使用此项目编译自己需要的 OpenWrt 固件
 
@@ -92,7 +94,6 @@ sudo apt-get -y install build-essential asciidoc binutils bzip2 gawk gettext git
 ```bash
 git clone https://github.com/openwrt/openwrt
 git clone https://github.com/garypang13/Actions-OpenWrt-Nginx
-sed -i 's/luci.git$/luci.git;openwrt-19.07/g' openwrt/feeds.conf.default
 cp -Rf Actions-OpenWrt-Nginx/* openwrt/
 cd openwrt
 ./scripts/feeds update -a && ./scripts/feeds install -a
