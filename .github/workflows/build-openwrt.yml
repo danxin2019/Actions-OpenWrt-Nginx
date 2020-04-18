@@ -24,7 +24,7 @@ env:
   CONFIG_FILE: X86_64.config
   DIY_SH: diy.sh
   FREE_UP_DISK: true
-  SSH_ACTIONS: true
+  SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
@@ -76,10 +76,10 @@ jobs:
     - name: Load custom configuration
       run: |
         [ -e files ] && mv files openwrt/files
-        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
         chmod +x $DIY_SH
         cd openwrt
         ../$DIY_SH
+        [ -e ../$CONFIG_FILE ] && mv ../$CONFIG_FILE .config
         make defconfig
         
     - name: Default PPPOE Setting
@@ -135,7 +135,7 @@ jobs:
         -or -name "*adbyby*" \
         -or -name "*baidupcs*" \
         -or -name "*cifs-mount*" \
-        -or -name "*music-remote-center*" -or -name *forked-daapd* \
+        -or -name "*music-remote-center*" -or -name "*forked-daapd*" \
         -or -name "*airplay2*" \
         -or -name "*openclash*" \
         -or -name "*softethervpn*" \
@@ -152,7 +152,7 @@ jobs:
         zip -r luci-app-adbyby-plus.zip *adbyby* 2>&1 >/dev/null
         zip -r luci-app-baidupcs-web.zip *baidupcs* 2>&1 >/dev/null
         zip -r luci-app-cifs-mount.zip *cifs-mount* 2>&1 >/dev/null
-        zip -r luci-app-music-remote-center.zip *music-remote-center* "*forked-daapd*" 2>&1 >/dev/null
+        zip -r luci-app-music-remote-center.zip *music-remote-center* *forked-daapd* 2>&1 >/dev/null
         zip -r luci-app-airplay2.zip *airplay2* 2>&1 >/dev/null
         zip -r luci-app-openclash.zip *openclash* 2>&1 >/dev/null
         zip -r luci-app-softethervpn.zip *softethervpn* 2>&1 >/dev/null
